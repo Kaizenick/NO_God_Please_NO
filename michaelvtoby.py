@@ -33,6 +33,28 @@ class Game:
         self.scaled_heart_surf = pygame.transform.scale(self.heart_surf, (BLOCK_WIDTH//4,BLOCK_HEIGHT//2.5))
         self.image = self.scaled_heart_surf
 
+        # some Background music
+        pygame.mixer.init()
+        # [Song Name, Loop Count, Start Time]
+        self.songs=[["mysounds/The Dunder Mifflin Commercial Song - The Office US - The Office.mp3",0,40.0],
+                   ["mysounds/The Office Michael Scott Speaker Scene - Symon.mp3",0,0.0],
+                   ["mysounds/The Office - Staying Alive! - motzaburger.mp3",0,0.0],
+                   ["mysounds/The Scarn - The Office - lofzfreak2.mp3",0,0.0],
+                   ["mysounds/Straight Outta Scranton - The Office US - The Office.mp3",0,0.0],
+                   ["mysounds/The Office - Andy & Erin's Sabre Song - avesquigs.mp3",0,0.0],
+                   ["mysounds/Hey Mr.Scott (Full Song) - Adam tech and other stuff.mp3",0,0.0]]
+        self.play_random_song()
+
+        # Set up user event on music end
+        self.MUSIC_END = pygame.USEREVENT + 1
+        pygame.mixer.music.set_endevent(self.MUSIC_END)
+
+    def play_random_song(self):
+        song = random.choice(self.songs)
+        pygame.mixer.music.load(song[0])
+        pygame.mixer.music.play(song[1], song[2])
+        pygame.mixer.music.set_volume(0.2)
+
     def create_upgrade(self,pos):
         upgrade_type = choice(UPGRADES)
         Upgrade(pos,upgrade_type,[self.all_sprites,self.upgrade_sprites])
@@ -81,9 +103,14 @@ class Game:
                 if event.type == pygame.QUIT or self.player.hearts <= 0:
                     pygame.quit()
                     sys.exit()
+
                 if event.type == pygame.KEYDOWN:
                     if event.key == pygame.K_SPACE:
                         self.ball.active = True
+
+                # Listen for music end event
+                if event.type == self.MUSIC_END:
+                    self.play_random_song()
 
             # update the game
             self.all_sprites.update(dt)
